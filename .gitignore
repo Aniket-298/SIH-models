@@ -1,0 +1,35 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+
+# Dataset
+data/
+real/
+fake/
+Sih/
+
+# Archives
+*.zip
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
