@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXSHIELD AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#070b14;
+    --panel:#0d1424;
+    --panel-alt:#0f1729;
+    --border:#1b2740;
+    --teal:#2dd4bf;
+    --teal-dim:#0f3d38;
+    --ink:#e6edf5;
+    --ink-dim:#7d8aa3;
+    --red:#f43f5e;
+    --red-dim:#3a1420;
+    --amber:#f5b942;
+    --amber-dim:#3a2c0d;
+    --green:#34d399;
+    --green-dim:#0f2e22;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+  }
+
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 28px;
+    border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+    gap:14px;
+  }
+
+  .brand{ display:flex; align-items:center; gap:14px; }
+
+  .logo{
+    width:44px; height:44px;
+    border-radius:9px;
+    background:var(--teal-dim);
+    border:1px solid var(--teal);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+
+  .logo::after{
+    content:'';
+    position:absolute;
+    bottom:-3px; right:-3px;
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 8px var(--teal);
+  }
+
+  .brand-text h1{
+    margin:0;
+    font-size:20px;
+    letter-spacing:0.03em;
+    font-weight:700;
+  }
+
+  .brand-text h1 span{ color:var(--teal); }
+
+  .brand-text p{
+    margin:2px 0 0;
+    font-size:13px;
+    color:var(--ink-dim);
+    font-style:italic;
+  }
+
+  .header-right{ display:flex; align-items:center; gap:14px; }
+
+  .stat-chip{
+    display:flex; align-items:center; gap:16px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 16px;
+    font-size:13px;
+  }
+
+  .stat-chip span{ color:var(--ink-dim); }
+  .stat-chip b{ color:var(--ink); font-weight:600; }
+  .stat-chip .dot-red{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--red); display:inline-block; margin-right:5px;
+  }
+
+  .bell{
+    position:relative;
+    width:38px; height:38px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .bell .badge{
+    position:absolute; top:-6px; right:-6px;
+    background:var(--red);
+    color:#fff;
+    font-size:10px;
+    font-weight:600;
+    border-radius:50%;
+    width:16px; height:16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ---------- layout ---------- */
+  main{ max-width:1040px; margin:0 auto; padding:24px 28px 60px; }
+
+  .banner{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:20px;
+    font-size:13.5px;
+    color:var(--ink-dim);
+    flex-wrap:wrap;
+  }
+
+  .banner-left{ display:flex; align-items:center; gap:10px; }
+  .banner code{ color:var(--ink); }
+  .banner .status{ color:var(--teal); }
+  .banner button{
+    background:none; border:none; color:var(--ink-dim);
+    cursor:pointer; font-size:16px; line-height:1;
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:22px;
+    margin-bottom:20px;
+  }
+
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px;
+  }
+
+  .card-head h2{
+    margin:0;
+    font-size:14px;
+    letter-spacing:0.06em;
+    font-weight:600;
+  }
+
+  .card-sub{ font-size:13px; color:var(--ink-dim); margin:0 0 18px; }
+
+  .pipeline-tag{
+    display:flex; align-items:center; gap:7px;
+    font-size:12px; color:var(--teal);
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  .pipeline-tag .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--teal); box-shadow:0 0 6px var(--teal);
+  }
+
+  /* capture card */
+  .capture-grid{
+    display:grid;
+    grid-template-columns:1fr 220px;
+    gap:16px;
+  }
+
+  #dropzone{
+    border:1.5px dashed var(--border);
+    border-radius:10px;
+    padding:30px 18px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+    background:var(--panel-alt);
+  }
+
+  #dropzone.drag-over{ border-color:var(--teal); background:#0e1c22; }
+  #dropzone.has-file{ border-style:solid; }
+
+  #dropzone .drop-title{ font-size:14.5px; font-weight:500; margin-bottom:4px; }
+  #dropzone .drop-sub{ font-size:12.5px; color:var(--ink-dim); }
+  #filename{ margin-top:10px; font-size:12px; color:var(--teal); word-break:break-all; }
+
+  input[type=file]{ display:none; }
+
+  .record-col{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--panel-alt);
+    padding:18px;
+  }
+
+  #recordBtn{
+    width:64px; height:64px;
+    border-radius:50%;
+    border:1px solid var(--teal);
+    background:var(--teal-dim);
+    color:var(--teal);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    font-size:22px;
+    transition:transform .1s ease;
+  }
+
+  #recordBtn:active{ transform:scale(0.95); }
+  #recordBtn.recording{
+    background:var(--red-dim);
+    border-color:var(--red);
+    color:var(--red);
+    animation:pulse 1s infinite;
+  }
+
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(244,63,94,0.35); }
+    50%{ box-shadow:0 0 0 10px rgba(244,63,94,0); }
+  }
+
+  #recordLabel{ font-size:12.5px; color:var(--ink-dim); text-align:center; }
+  #recordLabel b{ color:var(--ink); }
+
+  .status-line{
+    display:flex; align-items:center; gap:6px;
+    font-size:11px; color:var(--ink-dim);
+    margin-top:2px;
+  }
+
+  .status-dot{ width:6px; height:6px; border-radius:50%; background:var(--ink-dim); }
+  .status-dot.live{ background:var(--teal); box-shadow:0 0 6px var(--teal); }
+
+  #uploadStatus{
+    margin-top:14px;
+    font-size:13px;
+    color:var(--ink-dim);
+    min-height:18px;
+  }
+
+  #uploadStatus.error{ color:var(--red); }
+
+  /* detections list */
+  .empty-state{
+    text-align:center;
+    padding:30px 10px;
+    color:var(--ink-dim);
+    font-size:13.5px;
+  }
+
+  .detection{
+    border-top:1px solid var(--border);
+    padding:18px 0;
+  }
+
+  .detection:first-child{ border-top:none; padding-top:0; }
+
+  .det-top{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+    margin-bottom:10px;
+  }
+
+  .det-id-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .det-id{ font-size:14px; font-weight:600; }
+  .det-source{ font-size:12.5px; color:var(--ink-dim); }
+
+  .badge{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.03em;
+    padding:3px 10px;
+    border-radius:999px;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+
+  .badge.critical{ background:var(--red-dim); color:var(--red); }
+  .badge.suspicious{ background:var(--amber-dim); color:var(--amber); }
+  .badge.low{ background:var(--green-dim); color:var(--green); }
+
+  .det-actions{ display:flex; gap:8px; }
+
+  .det-actions button{
+    font-size:12.5px;
+    padding:7px 12px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--panel-alt);
+    color:var(--ink);
+    cursor:pointer;
+  }
+
+  .det-actions button.report{
+    background:var(--teal-dim);
+    border-color:var(--teal);
+    color:var(--teal);
+    font-weight:600;
+  }
+
+  .det-meta{
+    display:flex; gap:20px; flex-wrap:wrap;
+    font-size:12.5px; color:var(--ink-dim);
+    margin-bottom:10px;
+  }
+
+  .det-meta b{ color:var(--ink); }
+
+  .det-bar{
+    height:5px; width:100%;
+    background:var(--border);
+    border-radius:3px;
+    overflow:hidden;
+  }
+
+  .det-bar-fill{ height:100%; border-radius:3px; }
+
+  .det-detail{
+    display:none;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--border);
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    font-size:12.5px;
+  }
+
+  .det-detail.open{ display:grid; }
+  .det-detail .lbl{ color:var(--ink-dim); margin-bottom:3px; }
+  .det-detail .val{ color:var(--ink); font-size:15px; }
+
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-dim);
+    padding:20px 0 10px;
+  }
+
+  @media (max-width:640px){
+    .capture-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.8">
+        <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>VOXSHIELD <span>AI</span></h1>
+      <p>"Real-time AI voice deepfake detection"</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="stat-chip">
+      <span>Calls: <b id="statCalls">0</b></span>
+      <span><span class="dot-red"></span>Deepfakes: <b id="statDeepfakes">0</b></span>
+    </div>
+    <div class="bell">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7d8aa3" stroke-width="1.8">
+        <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.7 21a2 2 0 01-3.4 0" stroke-linecap="round"/>
+      </svg>
+      <span class="badge" id="bellBadge" style="display:none">0</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="banner">
+    <div class="banner-left">
+      <span>ⓘ</span>
+      <span>Audio is scored by an XGBoost + CNN ensemble at <code id="serverUrlLabel">http://localhost:3000/predict</code></span>
+    </div>
+    <div class="banner-left">
+      <span class="status">● Backend connected</span>
+      <button id="dismissBanner">✕</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>ANALYZE AUDIO</h2>
+    </div>
+    <p class="card-sub">Drop a clip in, or record 8 seconds live from your mic.</p>
+
+    <div class="capture-grid">
+      <div id="dropzone">
+        <div class="drop-title">Drag an audio file here</div>
+        <div class="drop-sub">or click to browse · wav, mp3, flac, m4a, ogg</div>
+        <div id="filename"></div>
+        <input type="file" id="fileInput" accept=".wav,.mp3,.flac,.m4a,.ogg,audio/*">
+      </div>
+
+      <div class="record-col">
+        <button id="recordBtn" title="Record 8 seconds">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="9" y="3" width="6" height="11" rx="3"/>
+            <path d="M5 11a7 7 0 0014 0M12 18v3" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div id="recordLabel">Record <b>8s</b> clip</div>
+        <div class="status-line"><span class="status-dot" id="recDot"></span><span id="recStatus">idle</span></div>
+      </div>
+    </div>
+
+    <div id="uploadStatus"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>RECENT DETECTIONS</h2>
+      <div class="pipeline-tag"><span class="dot"></span>MODEL PIPELINE</div>
+    </div>
+    <p class="card-sub">Each analyzed clip is scored and logged below.</p>
+
+    <div id="detectionList">
+      <div class="empty-state" id="emptyState">No clips analyzed yet — drop a file or record one above.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>VOXSHIELD AI · Ensemble voice-authenticity model · Prototype</footer>
+
+<script>
+  const SERVER_URL = "http://localhost:3000/predict";
+
+  // ---------- state ----------
+  let callCount = 0;
+  let deepfakeCount = 0;
+  const detections = [];
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const filenameEl = document.getElementById('filename');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const detectionList = document.getElementById('detectionList');
+  const emptyState = document.getElementById('emptyState');
+  const statCalls = document.getElementById('statCalls');
+  const statDeepfakes = document.getElementById('statDeepfakes');
+  const bellBadge = document.getElementById('bellBadge');
+  const recordBtn = document.getElementById('recordBtn');
+  const recordLabel = document.getElementById('recordLabel');
+  const recDot = document.getElementById('recDot');
+  const recStatus = document.getElementById('recStatus');
+
+  document.getElementById('dismissBanner').addEventListener('click', e => {
+    e.target.closest('.banner').style.display = 'none';
+  });
+
+  // ---------- drag & drop ----------
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  ['dragenter', 'dragover'].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('drag-over'); })
+  );
+  ['dragleave', 'drop'].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove('drag-over'); })
+  );
+  dropzone.addEventListener('drop', e => {
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file, file.name);
+  });
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) handleFile(file, file.name);
+  });
+
+  function handleFile(file, label) {
+    filenameEl.textContent = file.name;
+    dropzone.classList.add('has-file');
+    sendFile(file, label);
+  }
+
+  // ---------- 8-second WAV recording ----------
+  let audioCtx, mediaStream, sourceNode, processorNode, capturedChunks, capturing;
+
+  recordBtn.addEventListener('click', async () => {
+    if (capturing) return;
+    try {
+      await startRecording();
+    } catch (err) {
+      recStatus.textContent = 'mic access denied';
+      uploadStatus.textContent = `Couldn't access microphone: ${err.message}`;
+      uploadStatus.classList.add('error');
+    }
+  });
+
+  async function startRecording() {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    sourceNode = audioCtx.createMediaStreamSource(mediaStream);
+    processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+    capturedChunks = [];
+    capturing = true;
+
+    processorNode.onaudioprocess = e => {
+      const input = e.inputBuffer.getChannelData(0);
+      capturedChunks.push(new Float32Array(input));
+    };
+
+    sourceNode.connect(processorNode);
+    processorNode.connect(audioCtx.destination);
+
+    recordBtn.classList.add('recording');
+    recDot.classList.add('live');
+
+    let secondsLeft = 8;
+    recStatus.textContent = `recording · ${secondsLeft}s`;
+    const countdown = setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft > 0) recStatus.textContent = `recording · ${secondsLeft}s`;
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(countdown);
+      stopRecording();
+    }, 8000);
+  }
+
+  function stopRecording() {
+    processorNode.disconnect();
+    sourceNode.disconnect();
+    mediaStream.getTracks().forEach(t => t.stop());
+
+    const sampleRate = audioCtx.sampleRate;
+    const merged = mergeChunks(capturedChunks);
+    const wavBlob = encodeWav(merged, sampleRate);
+
+    recordBtn.classList.remove('recording');
+    recDot.classList.remove('live');
+    recStatus.textContent = 'idle';
+    capturing = false;
+
+    audioCtx.close();
+
+    const file = new File([wavBlob], `recording-${Date.now()}.wav`, { type: 'audio/wav' });
+    handleFile(file, 'Live recording');
+  }
+
+  function mergeChunks(chunks) {
+    const length = chunks.reduce((sum, c) => sum + c.length, 0);
+    const result = new Float32Array(length);
+    let offset = 0;
+    for (const c of chunks) { result.set(c, offset); offset += c.length; }
+    return result;
+  }
+
+  function encodeWav(samples, sampleRate) {
+    const buffer = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buffer);
+
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);        // PCM
+    view.setUint16(22, 1, true);        // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+
+    let offset = 44;
+    for (let i = 0; i < samples.length; i++, offset += 2) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    }
+
+    return new Blob([view], { type: 'audio/wav' });
+  }
+
+  function writeString(view, offset, str) {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  }
+
+  // ---------- send to backend ----------
+  async function sendFile(file, label) {
+    uploadStatus.textContent = 'Analyzing…';
+    uploadStatus.classList.remove('error');
+
+    const formData = new FormData();
+    formData.append('audio', file);
+
+    const started = performance.now();
+
+    try {
+      const res = await fetch(SERVER_URL, { method: 'POST', body: formData });
+      const latencyMs = performance.now() - started;
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || data.detail || `Request failed (${res.status})`);
+      }
+
+      addDetection(data, label, latencyMs);
+      uploadStatus.textContent = '';
+    } catch (err) {
+      uploadStatus.textContent = `Couldn't get a prediction: ${err.message}`;
+      uploadStatus.classList.add('error');
+    }
+  }
+
+  // ---------- render detections ----------
+  function addDetection(data, label, latencyMs) {
+    callCount += 1;
+    statCalls.textContent = callCount;
+
+    const pct = Math.round(data.probability * 100);
+    const isAI = data.prediction === 'AI-GENERATED';
+    if (isAI) {
+      deepfakeCount += 1;
+      statDeepfakes.textContent = deepfakeCount;
+      bellBadge.style.display = 'flex';
+      bellBadge.textContent = deepfakeCount;
+    }
+
+    let tier, badgeClass, barColor;
+    if (pct >= 70) { tier = 'CRITICAL DEEPFAKE'; badgeClass = 'critical'; barColor = 'var(--red)'; }
+    else if (pct >= 40) { tier = 'SUSPICIOUS'; badgeClass = 'suspicious'; barColor = 'var(--amber)'; }
+    else { tier = 'LOW RISK'; badgeClass = 'low'; barColor = 'var(--green)'; }
+
+    const id = `CALL-${String(callCount).padStart(3, '0')}`;
+    const detailId = `detail-${callCount}`;
+
+    const el = document.createElement('div');
+    el.className = 'detection';
+    el.innerHTML = `
+      <div class="det-top">
+        <div class="det-id-row">
+          <span class="det-id">${id}</span>
+          <span class="det-source">${escapeHtml(label)}</span>
+          <span class="badge ${badgeClass}">${tier}</span>
+        </div>
+        <div class="det-actions">
+          <button class="details-btn">Details</button>
+          <button class="ignore-btn">Ignore</button>
+          <button class="report">Report</button>
+        </div>
+      </div>
+      <div class="det-meta">
+        <span>AI probability <b>${pct}%</b></span>
+        <span>Latency <b>${(latencyMs / 1000).toFixed(1)}s</b></span>
+        <span>just now</span>
+      </div>
+      <div class="det-bar"><div class="det-bar-fill" style="width:${pct}%; background:${barColor}"></div></div>
+      <div class="det-detail" id="${detailId}">
+        <div><div class="lbl">XGBoost signal</div><div class="val">${data.xgboost_probability.toFixed(3)}</div></div>
+        <div><div class="lbl">CNN signal</div><div class="val">${data.cnn_probability.toFixed(3)}</div></div>
+      </div>
+    `;
+
+    el.querySelector('.details-btn').addEventListener('click', () => {
+      document.getElementById(detailId).classList.toggle('open');
+    });
+    el.querySelector('.ignore-btn').addEventListener('click', () => el.remove());
+    el.querySelector('.report').addEventListener('click', function () {
+      this.textContent = 'Reported ✓';
+      this.disabled = true;
+    });
+
+    emptyState.style.display = 'none';
+    detectionList.prepend(el);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
